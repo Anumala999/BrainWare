@@ -1,4 +1,5 @@
-﻿<div class="jumbotron">
+﻿@model IEnumerable<Web.Models.Order>
+<div class="jumbotron">
     <h1>BrainWare Orders</h1>
     <p class="lead">This is the BrainWare orders page! Welcome</p>
 </div>
@@ -7,38 +8,68 @@
         <h2>Your Orders</h2>
         <div id="orders"></div>
     </div>
-  
+
 </div>
-<script>
-    $(document).ready(function () {
-        var $orders = $('#orders');
-        $.ajax({
-            'url': '/api/order/1',
-            'type': 'GET',
-            'success': function (data) {
+<br />
 
-                var $orderList = $('<ul/>');
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().CompanyName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().OrderTotal)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CompanyName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderTotal)
+                </td>
+            </tr>
 
-                if (data) {
-                    $.each(data,
-                        function(i) {
-                            var $li = $('<li/>').text(this.Description + ' (Total: $' + this.OrderTotal + ')')
-                                .appendTo($orderList);
+            if (item.OrderProducts != null && item.OrderProducts.Any())
+            {
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>
+                        Product Name
+                    </th>
+                    <th>
+                        Product Price
+                    </th>
+                    <th>
+                        Total Quantity
+                    </th>
+                </tr>
+            </thead>
 
-                            var $productList = $('<ul/>');
-
-                            $.each(this.OrderProducts, function(j) {
-                                var $li2 = $('<li/>').text(this.Product.Name + ' ('+ this.Quantity +' @@ $' + this.Price + '/ea)')
-                                    .appendTo($productList);
-                            });
-
-                            $productList.appendTo($li);
-                        });
-
-                    $orders.append($orderList);
+            <tbody>
+                @foreach (var prod in item.OrderProducts)
+                {
+                    <tr>
+                        <td></td>
+                        <td>@prod.Product.Name</td>
+                        <td>$@prod.Price</td>
+                        <td>@prod.Quantity</td>
+                    </tr>
                 }
-            }
-        });
-    });
-</script>
+            </tbody>
+        }
+    }
 
+    </table>
